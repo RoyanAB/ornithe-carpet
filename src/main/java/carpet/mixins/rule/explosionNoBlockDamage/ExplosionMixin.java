@@ -14,8 +14,7 @@ public abstract class ExplosionMixin {
             method = "damageEntities",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/World;getBlockState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/state/BlockState;",
-                    remap = false
+                    target = "Lnet/minecraft/world/World;getBlockState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/state/BlockState;"
             )
     )
     private BlockState explosionNoDamage(BlockState original) {
