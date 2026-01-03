@@ -10,12 +10,12 @@ import java.util.HashMap;
 import java.util.List;
 
 public class SpawnReporter {
-    public static final HashMap<Integer, HashMap<MobCategory, Pair<Integer, Integer>>> mobcaps = new HashMap<>();
+    public static final HashMap<Integer, HashMap<MobCategory, Integer>> MOB_CAPS = new HashMap<>();
 
     static {
-        mobcaps.put(-1, new HashMap<>());
-        mobcaps.put(0, new HashMap<>());
-        mobcaps.put(1, new HashMap<>());
+        MOB_CAPS.put(-1, new HashMap<>());
+        MOB_CAPS.put(0, new HashMap<>());
+        MOB_CAPS.put(1, new HashMap<>());
     }
 
     public static List<Text> printMobcapsForDimension(World world, int dim, String name, boolean multiLine) {

@@ -1,9 +1,9 @@
 package carpet.log.framework;
 
+import carpet.CarpetSettings;
 import carpet.helpers.HopperCounter;
 import carpet.log.loggers.packets.PacketCounter;
 import carpet.mixins.accessor.TabListS2CPacketA;
-import carpet.CarpetSettings;
 import carpet.utils.Messenger;
 import carpet.utils.SpawnReporter;
 import net.minecraft.entity.living.mob.MobCategory;
@@ -13,7 +13,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.entity.living.player.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.util.Pair;
 import net.minecraft.util.math.MathHelper;
 
 import java.util.*;
@@ -68,7 +67,7 @@ public class HudController {
         }
 
         if (LoggerRegistry.__mobcaps) {
-            LoggerRegistry.getLogger("mobcaps").log(HudController::send_mobcap_display);
+            LoggerRegistry.getLogger("mobcaps").log((playerOption, player) -> send_mobcap_display(playerOption, server, player));
         }
 
         if (LoggerRegistry.__counter) {
@@ -117,7 +116,7 @@ public class HudController {
                 "g  MSPT: ", String.format(Locale.US, "%s %.1f", color, MSPT))};
     }
 
-    private static Text[] send_mobcap_display(String option, PlayerEntity player) {
+    private static Text[] send_mobcap_display(String option, MinecraftServer server, PlayerEntity player) {
         int dim;
         switch (option) {
             case "overworld":
@@ -136,9 +135,9 @@ public class HudController {
         }
         List<Text> text = new ArrayList<>();
         for (MobCategory type : MobCategory.values()) {
-            Pair<Integer, Integer> counts = SpawnReporter.mobcaps.get(dim).getOrDefault(type, new Pair<>(0, 0));
-            int actual = counts.getLeft();
-            int limit = counts.getRight();
+            int actual = server.getWorld(dim).getEntityCount(type.getType());
+            int limit = SpawnReporter.MOB_CAPS.get(dim).getOrDefault(type, 0);
+
             text.add(Messenger.c((actual + limit == 0) ? "g -" : Messenger.heatmap_color(actual, limit) + " " + actual,
                     Messenger.creatureTypeColor(type) + " /" + ((actual + limit == 0) ? "-" : limit)
             ));
