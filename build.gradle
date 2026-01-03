@@ -1,12 +1,12 @@
 plugins {
 	id 'maven-publish'
-	id 'fabric-loom' version '1.6-SNAPSHOT'
-	id 'ploceus' version '1.6-SNAPSHOT'
-	id "com.github.johnrengelman.shadow" version "8.1.0" // for mixin extra shadowJar
+	id 'fabric-loom' version '1.14-SNAPSHOT'
+	id 'ploceus' version '1.14-SNAPSHOT'
+	id "com.github.johnrengelman.shadow" version "8.1.1" // for mixin extra shadowJar
 }
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
+//sourceCompatibility = JavaVersion.VERSION_1_8
+//targetCompatibility = JavaVersion.VERSION_1_8
 
 base {
 	archivesName = project.archives_base_name
@@ -29,6 +29,9 @@ configurations {
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings ploceus.featherMappings(project.feather_build)
+	exceptions ploceus.raven(project.raven_build) // remove this line if not using exceptions patches
+	signatures ploceus.sparrow(project.sparrow_build) // remove this line if not using generics patches
+//	nests ploceus.nests(project.nests_build) // remove this line if not using inner class patches
 
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
