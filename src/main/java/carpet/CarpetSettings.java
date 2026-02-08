@@ -405,6 +405,8 @@ public class CarpetSettings {
         }
     }
 
+    @Rule(desc = "Mining blocks while sneaking and subscribed to /log carefulBreak will place them in your inventory ", categories = FEATURE)
+    public static boolean carefulBreak = false;
 
     // COMMAND // not sure how to generate those BIG comments
     @Rule(
