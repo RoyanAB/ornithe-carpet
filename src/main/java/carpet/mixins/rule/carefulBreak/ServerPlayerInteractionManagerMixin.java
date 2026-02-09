@@ -26,11 +26,33 @@ public abstract class ServerPlayerInteractionManagerMixin {
         method = "tryMineBlock",
         at = @At(
             value = "INVOKE",
+            target = "Lnet/minecraft/server/ServerPlayerInteractionManager;mineBlock(Lnet/minecraft/util/math/BlockPos;)Z"
+        )
+    )
+    private boolean setCarefulBreakOnMinePlayer(ServerPlayerInteractionManager instance, BlockPos pos, Operation<Boolean> original) {
+        // allows picking up blocks that break in beforeMinedByPlayer (Shulker Boxes, Beds, Doors, etc)
+        // and blocks that break off (torches, rails, etc)
+        if (CarpetSettings.carefulBreak) {
+            try {
+                CarefulBreakHelper.miningPlayer.set(this.player);
+                return original.call(instance, pos);
+            } finally {
+                CarefulBreakHelper.miningPlayer.set(null);
+            }
+        } else {
+            return original.call(instance, pos);
+        }
+    }
+
+    @WrapOperation(
+        method = "tryMineBlock",
+        at = @At(
+            value = "INVOKE",
             target = "Lnet/minecraft/block/Block;afterMinedByPlayer(Lnet/minecraft/world/World;Lnet/minecraft/entity/living/player/PlayerEntity;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/BlockState;Lnet/minecraft/block/entity/BlockEntity;Lnet/minecraft/item/ItemStack;)V"
         )
     )
-    private void setCarefulBreakPlayer(Block instance, World world, PlayerEntity player, BlockPos pos, BlockState state,
-                                       BlockEntity blockEntity, ItemStack stack, Operation<Void> original) {
+    private void setCarefulBreakAfterMinePlayer(Block instance, World world, PlayerEntity player, BlockPos pos, BlockState state,
+                                                BlockEntity blockEntity, ItemStack stack, Operation<Void> original) {
         if (CarpetSettings.carefulBreak) {
             try {
                 CarefulBreakHelper.miningPlayer.set(this.player);
