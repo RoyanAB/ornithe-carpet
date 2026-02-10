@@ -4,6 +4,7 @@ import carpet.CarpetServer;
 import carpet.SharedConstants;
 import carpet.api.log.HudLogger;
 import carpet.api.log.Logger;
+import carpet.helpers.CarefulBreakHelper;
 import com.google.common.base.Charsets;
 import com.google.gson.*;
 import net.minecraft.entity.living.player.PlayerEntity;
@@ -67,6 +68,7 @@ public class LoggerRegistry {
         registerLogger("items", Logger.standardLogger("items", "brief", new String[]{"brief", "full"}));
         registerLogger("rng", Logger.standardLogger("rng", null, null));
         registerLogger("explosions", Logger.standardLogger("explosions", "compact", new String[]{"brief", "full", "compact"}));
+        registerLogger("carefulBreak", Logger.standardLogger("carefulBreak", null, null));
 
         registerLogger("autosave", HudLogger.standardHudLogger("autosave", null, null));
         registerLogger("tps", HudLogger.standardHudLogger("tps", null, null));
