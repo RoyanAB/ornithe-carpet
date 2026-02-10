@@ -424,7 +424,7 @@ public class CarpetSettings {
             validators = CarpetPermissionLevel.class,
             options = {"true", "false", "ops", "0", "2", "4"}
     )
-    public static String commandChunk = "false";
+    public static String chunkCommand = "false";
 
     @Rule(
             desc = "Enables /tick command to control game clocks",
