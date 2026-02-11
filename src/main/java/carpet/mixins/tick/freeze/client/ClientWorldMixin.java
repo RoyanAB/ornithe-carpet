@@ -14,12 +14,7 @@ public class ClientWorldMixin implements WorldF {
     @Unique
     private TickRateManager tickRateManager;
 
-    @Inject(
-            method = "<init>",
-            at = @At(
-                    "RETURN"
-            )
-    )
+    @Inject(method = "<init>", at = @At("RETURN"))
     private void onInit(CallbackInfo ci) {
         this.tickRateManager = new TickRateManager();
     }

@@ -16,12 +16,7 @@ public class MinecraftServerMixin implements MinecraftServerF {
     @Unique
     private ServerTickRateManager serverTickRateManager;
 
-    @Inject(
-            method = "<init>",
-            at = @At(
-                    "RETURN"
-            )
-    )
+    @Inject(method = "<init>", at = @At("RETURN"))
     private void onInit(CallbackInfo ci) {
         serverTickRateManager = new ServerTickRateManager((MinecraftServer) (Object) this);
     }
@@ -30,11 +25,6 @@ public class MinecraftServerMixin implements MinecraftServerF {
     @Override
     public ServerTickRateManager getTickRateManager() {
         return serverTickRateManager;
-    }
-
-    @Unique
-    public ServerTickRateManager tickRateManager() {
-        return this.getTickRateManager();
     }
 
     @Inject(
@@ -46,8 +36,8 @@ public class MinecraftServerMixin implements MinecraftServerF {
                     ordinal = 0
             )
     )
-    private void onTick(CallbackInfo ci) {
-        tickRateManager().tick();
+    private void tickTRM(CallbackInfo ci) {
+        serverTickRateManager.tick();
     }
 
 
@@ -55,11 +45,12 @@ public class MinecraftServerMixin implements MinecraftServerF {
             method = "tick",
             at = @At(
                     value = "FIELD",
-                    target = "Lnet/minecraft/server/MinecraftServer;ticks:I", opcode = 181 /* PUTFIELD */
+                    target = "Lnet/minecraft/server/MinecraftServer;ticks:I",
+                    opcode = 181 /* PUTFIELD */
             )
     )
-    public boolean wrapServerTickUpdate(MinecraftServer instance, int value) {
-        return tickRateManager().runsNormally();
+    public boolean freezeTickCount(MinecraftServer instance, int value) {
+        return serverTickRateManager.runsNormally();
     }
 
     @WrapWithCondition(
@@ -69,7 +60,7 @@ public class MinecraftServerMixin implements MinecraftServerF {
                     target = "Lnet/minecraft/server/MinecraftServer;saveWorlds(Z)V"
             )
     )
-    public boolean wrapAutosave(MinecraftServer instance, boolean silent) {
-        return tickRateManager().runsNormally();
+    public boolean freezeAutoSave(MinecraftServer instance, boolean silent) {
+        return serverTickRateManager.runsNormally();
     }
 }

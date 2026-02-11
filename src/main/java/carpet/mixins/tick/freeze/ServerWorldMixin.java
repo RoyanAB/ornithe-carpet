@@ -31,7 +31,6 @@ public abstract class ServerWorldMixin implements WorldF {
         return ((MinecraftServerF) getServer()).getTickRateManager();
     }
 
-
     @WrapWithCondition(
             method = "tick",
             at = @At(
@@ -39,7 +38,7 @@ public abstract class ServerWorldMixin implements WorldF {
                     target = "Lnet/minecraft/world/World;tick()V"
             )
     )
-    public boolean wrapTickWeather(World instance) {
+    public boolean freezeTickWeather(World instance) {
         return tickRateManager().runsNormally();
     }
 
@@ -50,7 +49,7 @@ public abstract class ServerWorldMixin implements WorldF {
                     target = "Lnet/minecraft/world/NaturalSpawner;tick(Lnet/minecraft/server/world/ServerWorld;ZZZ)I"
             )
     )
-    public boolean wrapMobSpawning(NaturalSpawner instance, ServerWorld world, boolean spawnAnimals, boolean spawnMonsters, boolean spawnRareMobs) {
+    public boolean freezeMobSpawning(NaturalSpawner instance, ServerWorld world, boolean spawnAnimals, boolean spawnMonsters, boolean spawnRareMobs) {
         return tickRateManager().runsNormally();
     }
 
@@ -61,7 +60,7 @@ public abstract class ServerWorldMixin implements WorldF {
                     target = "Lnet/minecraft/world/WorldData;setTime(J)V"
             )
     )
-    public boolean wrapWorldTimeUpdate(WorldData instance, long time) {
+    public boolean freezeWorldTimeUpdate(WorldData instance, long time) {
         return tickRateManager().runsNormally();
     }
 
@@ -72,7 +71,7 @@ public abstract class ServerWorldMixin implements WorldF {
                     target = "Lnet/minecraft/world/WorldData;setTimeOfDay(J)V"
             )
     )
-    public boolean wrapDayTimeUpdate(WorldData instance, long time) {
+    public boolean freezeDayTimeUpdate(WorldData instance, long time) {
         return tickRateManager().runsNormally();
     }
 
@@ -83,7 +82,7 @@ public abstract class ServerWorldMixin implements WorldF {
                     target = "Lnet/minecraft/server/world/ServerWorld;doScheduledTicks(Z)Z"
             )
     )
-    public boolean wrapTileTicks(ServerWorld instance, boolean flush) {
+    public boolean freezeTileTicks(ServerWorld instance, boolean flush) {
         return tickRateManager().runsNormally();
     }
 
@@ -94,7 +93,7 @@ public abstract class ServerWorldMixin implements WorldF {
                     target = "Lnet/minecraft/server/world/ServerWorld;tickChunks()V"
             )
     )
-    public boolean wrapChunkTicks(ServerWorld instance) {
+    public boolean freezeChunkTicks(ServerWorld instance) {
         return tickRateManager().runsNormally();
     }
 
@@ -105,7 +104,7 @@ public abstract class ServerWorldMixin implements WorldF {
                     target = "Lnet/minecraft/world/village/SavedVillageData;tick()V"
             )
     )
-    public boolean wrapVillages(SavedVillageData instance) {
+    public boolean freezeVillages(SavedVillageData instance) {
         return tickRateManager().runsNormally();
     }
 
@@ -116,7 +115,7 @@ public abstract class ServerWorldMixin implements WorldF {
                     target = "Lnet/minecraft/world/village/VillageSiege;tick()V"
             )
     )
-    public boolean wrapVillageSieges(VillageSiege instance) {
+    public boolean freezeVillageSieges(VillageSiege instance) {
         return tickRateManager().runsNormally();
     }
 
@@ -127,7 +126,7 @@ public abstract class ServerWorldMixin implements WorldF {
                     target = "Lnet/minecraft/server/world/PortalForcer;tick(J)V"
             )
     )
-    public boolean wrapPortalRemoval(PortalForcer instance, long time) {
+    public boolean freezePortalRemoval(PortalForcer instance, long time) {
         return tickRateManager().runsNormally() && !((ServerTickRateManager) tickRateManager()).deeplyFrozen();
     }
 
@@ -138,7 +137,7 @@ public abstract class ServerWorldMixin implements WorldF {
                     target = "Lnet/minecraft/server/world/ServerWorld;doBlockEvents()V"
             )
     )
-    public boolean wrapBlockEvents(ServerWorld instance) {
+    public boolean freezeBlockEvents(ServerWorld instance) {
         return tickRateManager().runsNormally();
     }
 }

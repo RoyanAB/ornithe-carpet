@@ -10,6 +10,9 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(World.class)
 public abstract class WorldMixin implements WorldF {
+
+    // World.globalEntities, for weather entities(seems only contain lightning bolt)
+    // lightning bolt
     @WrapWithCondition(
             method = "tickEntities",
             at = @At(
@@ -18,10 +21,11 @@ public abstract class WorldMixin implements WorldF {
                     opcode = 181 /* PUTFIELD */
             )
     )
-    public boolean disableGlobalEntityTick0(Entity instance, int value) {
+    public boolean freezeLightningBoltTime(Entity instance, int value) {
         return this.tickRateManager().shouldEntityTick(instance);
     }
 
+    // lightning bolt
     @WrapWithCondition(
             method = "tickEntities",
             at = @At(
@@ -29,10 +33,12 @@ public abstract class WorldMixin implements WorldF {
                     target = "Lnet/minecraft/entity/Entity;tick()V"
             )
     )
-    public boolean disableGlobalEntityTick1(Entity instance) {
+    public boolean freezeLightningBoltTick(Entity instance) {
         return this.tickRateManager().shouldEntityTick(instance);
     }
 
+    // World.entities, for all loaded entities
+    // loaded entity
     @WrapWithCondition(
             method = "tickEntities",
             at = @At(
@@ -40,10 +46,12 @@ public abstract class WorldMixin implements WorldF {
                     target = "Lnet/minecraft/world/World;updateEntity(Lnet/minecraft/entity/Entity;)V"
             )
     )
-    public boolean disableRegularEntityTick(World instance, Entity entity) {
+    public boolean freezeEntityUpdate(World instance, Entity entity) {
         return this.tickRateManager().shouldEntityTick(entity);
     }
 
+    // World.tickingBlockEntities
+    // block entity
     @WrapWithCondition(
             method = "tickEntities",
             at = @At(
@@ -51,7 +59,7 @@ public abstract class WorldMixin implements WorldF {
                     target = "Lnet/minecraft/util/Tickable;tick()V"
             )
     )
-    public boolean disableRegularBlockEntityTick(Tickable instance) {
+    public boolean freezeBlockEntityTick(Tickable instance) {
         return this.tickRateManager().runsNormally();
     }
 }

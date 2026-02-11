@@ -17,14 +17,8 @@ public class ServerChunkCacheMixin {
     @Final
     private ServerWorld world;
 
-    @Inject(
-            method = "tick",
-            at = @At(
-                    "HEAD"
-            ),
-            cancellable = true
-    )
-    private void onTick(CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
+    private void freezeChunkTick(CallbackInfoReturnable<Boolean> cir) {
         ServerTickRateManager strm = ((MinecraftServerF) this.world.getServer()).getTickRateManager();
         if (!strm.runsNormally() && strm.deeplyFrozen()) {
             cir.setReturnValue(false);

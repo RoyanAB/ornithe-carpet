@@ -107,16 +107,16 @@ public class HudController {
     }
 
     private static Text[] send_tps_display(MinecraftServer server) {
-        ServerTickRateManager trm = ((MinecraftServerF)server).getTickRateManager();
+        ServerTickRateManager trm = ((MinecraftServerF) server).getTickRateManager();
         double MSPT = MathHelper.average(server.averageTickTimes) * 1.0E-6D;
-        double TPS = 1000.0D / Math.max(trm.isInWarpSpeed()?0.0:trm.mspt(), MSPT);
+        double TPS = 1000.0D / Math.max(trm.isInWarpSpeed() ? 0.0 : trm.mspt(), MSPT);
         if (trm.gameIsPaused()) {
             TPS = 0;
         }
-        String color = Messenger.heatmap_color(MSPT,trm.mspt());
+        String color = Messenger.heatmap_color(MSPT, trm.mspt());
         return new Text[]{Messenger.c(
-                "g TPS: ", String.format(Locale.US, "%s %.1f",color, TPS),
-                "g  MSPT: ", String.format(Locale.US,"%s %.1f", color, MSPT))};
+                "g TPS: ", String.format(Locale.US, "%s %.1f", color, TPS),
+                "g  MSPT: ", String.format(Locale.US, "%s %.1f", color, MSPT))};
     }
 
     private static Text[] send_mobcap_display(String option, MinecraftServer server, PlayerEntity player) {

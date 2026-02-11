@@ -20,8 +20,7 @@ public abstract class WorldRendererMixin {
             )
     )
     public float disableEntityInterpolation(Entity entity, float tickDelta, boolean hitbox) {
-        return ((WorldF) Minecraft.getInstance().world).tickRateManager().runsNormally() || entity instanceof ClientPlayerEntity
-                ? tickDelta : 0.0f;
+        return ((WorldF) Minecraft.getInstance().world).tickRateManager().runsNormally() || entity instanceof ClientPlayerEntity ? tickDelta : 0.0f;
     }
 
     @ModifyArg(

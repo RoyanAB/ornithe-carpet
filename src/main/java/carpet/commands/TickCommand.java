@@ -52,6 +52,7 @@ public class TickCommand extends CarpetAbstractCommand {
                     toggleSuperHot(commandSource);
                     break;
                 case "warp":
+                    // todo tick warp toggle
                     setWarp(commandSource, 0, null);
                     break;
                 default:
@@ -71,6 +72,7 @@ public class TickCommand extends CarpetAbstractCommand {
             }
         }
 
+        // todo handle NumberFormatException while parsing str input
         if (strings.length == 2 && "step".equalsIgnoreCase(strings[0])) {
             step(commandSource, MathHelper.clamp(Integer.parseInt(strings[1]), 1, 72000));
         }
@@ -100,13 +102,14 @@ public class TickCommand extends CarpetAbstractCommand {
             if ("freeze".equalsIgnoreCase(strings[0]))
                 return suggestMatching(strings, Arrays.asList("status", "deep", "on", "off"));
             if ("step".equalsIgnoreCase(strings[0]))
-                return suggestMatching(strings, Collections.singletonList("20"));
+                return suggestMatching(strings, "20");
             if ("rate".equalsIgnoreCase(strings[0]))
-                return suggestMatching(strings, Collections.singletonList("20"));
+                return suggestMatching(strings, "20");
             if ("warp".equalsIgnoreCase(strings[0]))
                 return suggestMatching(strings, Arrays.asList("3600", "72000"));
-        } else {
-            return strings.length == 3 && "freeze".equalsIgnoreCase(strings[0]) && "on".equalsIgnoreCase(strings[1]) ? Collections.singletonList("deep") : Collections.emptyList();
+        } else if (strings.length == 3) {
+            if ("freeze".equalsIgnoreCase(strings[0]) && "on".equalsIgnoreCase(strings[1]))
+                return suggestMatching(strings, "deep");
         }
         return Collections.emptyList();
     }
@@ -172,10 +175,11 @@ public class TickCommand extends CarpetAbstractCommand {
 
     private static int setWarp(CommandSource source, int advance, String tail_command) {
         ServerPlayerEntity player;
-        if (source.asEntity() instanceof ServerPlayerEntity)
-            player = ((ServerPlayerEntity) source.asEntity());
-        else
+        if (source instanceof ServerPlayerEntity) {
+            player = (ServerPlayerEntity) source;
+        } else {
             player = null; // may be null
+        }
         ServerTickRateManager trm = ((MinecraftServerF) source.getServer()).getTickRateManager();
         Text message = trm.requestGameToWarpSpeed(player, advance, tail_command, source);
         source.sendMessage(message);

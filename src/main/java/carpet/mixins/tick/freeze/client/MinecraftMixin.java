@@ -18,12 +18,7 @@ public class MinecraftMixin implements MinecraftF {
     @Shadow
     public ClientWorld world;
 
-    @Inject(
-            method = "tick",
-            at = @At(
-                    "HEAD"
-            )
-    )
+    @Inject(method = "tick", at = @At("HEAD"))
     private void onClientTick(CallbackInfo info) {
         if (this.world != null) {
             getTickRateManager().ifPresent(TickRateManager::tick);

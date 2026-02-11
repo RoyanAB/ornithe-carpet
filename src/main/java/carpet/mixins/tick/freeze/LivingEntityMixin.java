@@ -18,7 +18,7 @@ public class LivingEntityMixin {
             ),
             cancellable = true
     )
-    private void onPushEntities(CallbackInfo ci) {
+    private void freezeEntityCramming(CallbackInfo ci) {
         if ((LivingEntity) (Object) this instanceof ServerPlayerEntity) {
             MinecraftServer server = ((LivingEntity) (Object) this).world.getServer();
             if (((MinecraftServerF) server).getTickRateManager().gameIsPaused()) {
