@@ -7,14 +7,13 @@ import carpet.network.ServerNetworkHandler;
 import carpet.utils.Messenger;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.exception.CommandException;
+import net.minecraft.server.command.exception.IncorrectUsageException;
 import net.minecraft.server.command.source.CommandSource;
 import net.minecraft.server.entity.living.player.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,7 +25,7 @@ public class TickCommand extends CarpetAbstractCommand {
 
     @Override
     public String getUsage(CommandSource commandSource) {
-        return this.getName() + " <option>";
+        return "Usage: /tick <freeze|step|rate|superhot|warp> [options]";
     }
 
     @Override
@@ -36,6 +35,10 @@ public class TickCommand extends CarpetAbstractCommand {
 
     @Override
     public void run(MinecraftServer minecraftServer, CommandSource commandSource, String[] strings) throws CommandException {
+        if (strings.length == 0) {
+            throw new IncorrectUsageException(getUsage(commandSource));
+        }
+
         if (strings.length == 1) {
             String action = strings[0].toLowerCase();
             switch (action) {
@@ -58,6 +61,7 @@ public class TickCommand extends CarpetAbstractCommand {
                 default:
                     break;
             }
+            return;
         }
 
         if (strings.length == 2 && "freeze".equalsIgnoreCase(strings[0])) {
@@ -70,43 +74,47 @@ public class TickCommand extends CarpetAbstractCommand {
             } else if ("off".equalsIgnoreCase(strings[1])) {
                 setFreeze(commandSource, false, false);
             }
+            return;
         }
 
-        // todo handle NumberFormatException while parsing str input
         if (strings.length == 2 && "step".equalsIgnoreCase(strings[0])) {
-            step(commandSource, MathHelper.clamp(Integer.parseInt(strings[1]), 1, 72000));
+            step(commandSource, parseInt(strings[1], 1, 72000));
+            return;
         }
 
         if (strings.length == 2 && "rate".equalsIgnoreCase(strings[0])) {
-            setTps(commandSource, MathHelper.clamp(Float.parseFloat(strings[1]), 0.1F, 500.0F));
+            setTps(commandSource, (float) parseDouble(strings[1], 0.1F, 10000.0F));
+            return;
         }
 
         if (strings.length == 2 && "warp".equalsIgnoreCase(strings[0])) {
-            setWarp(commandSource, Math.max(Integer.parseInt(strings[1]), 1), null);
+            setWarp(commandSource, parseInt(strings[1], 0), null);
+            return;
         }
 
         if (strings.length == 3 && "freeze".equalsIgnoreCase(strings[0]) && "on".equalsIgnoreCase(strings[1]) && "deep".equalsIgnoreCase(strings[2])) {
             setFreeze(commandSource, true, true);
+            return;
         }
 
         if (strings.length == 3 && "warp".equalsIgnoreCase(strings[0])) {
-            setWarp(commandSource, Math.max(Integer.parseInt(strings[1]), 1), strings[2]);
+            setWarp(commandSource, parseInt(strings[1], 1), strings[2]);
         }
     }
 
     @Override
     public List<String> getSuggestions(MinecraftServer minecraftServer, CommandSource commandSource, String[] strings, @Nullable BlockPos blockPos) {
         if (strings.length == 1) {
-            return suggestMatching(strings, Arrays.asList("freeze", "step", "rate", "superhot", "warp"));
+            return suggestMatching(strings, "freeze", "step", "rate", "superhot", "warp");
         } else if (strings.length == 2) {
             if ("freeze".equalsIgnoreCase(strings[0]))
-                return suggestMatching(strings, Arrays.asList("status", "deep", "on", "off"));
+                return suggestMatching(strings, "status", "deep", "on", "off");
             if ("step".equalsIgnoreCase(strings[0]))
                 return suggestMatching(strings, "20");
             if ("rate".equalsIgnoreCase(strings[0]))
                 return suggestMatching(strings, "20");
             if ("warp".equalsIgnoreCase(strings[0]))
-                return suggestMatching(strings, Arrays.asList("3600", "72000"));
+                return suggestMatching(strings, "3600", "72000");
         } else if (strings.length == 3) {
             if ("freeze".equalsIgnoreCase(strings[0]) && "on".equalsIgnoreCase(strings[1]))
                 return suggestMatching(strings, "deep");
@@ -142,8 +150,12 @@ public class TickCommand extends CarpetAbstractCommand {
 
     private static int step(CommandSource source, int advance) {
         ServerTickRateManager trm = ((MinecraftServerF) source.getServer()).getTickRateManager();
-        trm.stepGameIfPaused(advance);
-        Messenger.m(source, "gi Stepping " + advance + " tick" + (advance != 1 ? "s" : ""));
+        if (trm.gameIsPaused()) {
+            trm.stepGameIfPaused(advance);
+            Messenger.m(source, "gi Stepping " + advance + " tick" + (advance != 1 ? "s" : ""));
+        } else {
+            Messenger.m(source, "gi Unable to step the game - the game must be frozen first");
+        }
         return 1;
     }
 
