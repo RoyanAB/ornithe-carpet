@@ -1,46 +1,66 @@
 package carpet.mixins.tick.freeze;
 
-import carpet.tick.TickContext;
+import carpet.fakes.MinecraftServerF;
+import carpet.helpers.ServerTickRateManager;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.world.ServerWorld;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = MinecraftServer.class, priority = 100)
-public abstract class MinecraftServerMixin {
+@Mixin(MinecraftServer.class)
+public class MinecraftServerMixin implements MinecraftServerF {
+
     @Unique
-    private static final TickContext CONTEXT = TickContext.INSTANCE;
+    private ServerTickRateManager serverTickRateManager;
 
-    @Inject(method = "run", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/MinecraftServer;tick()V"))
-    public void preTickFreezer(CallbackInfo ci) {
-        CONTEXT.preTickFreezer();
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void onInit(CallbackInfo ci) {
+        serverTickRateManager = new ServerTickRateManager((MinecraftServer) (Object) this);
     }
 
-    @Inject(method = "run", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/MinecraftServer;tick()V", shift = At.Shift.AFTER))
-    public void postTickFreezer(CallbackInfo ci) {
-        CONTEXT.postTickFreezer();
+    @Unique
+    @Override
+    public ServerTickRateManager getTickRateManager() {
+        return serverTickRateManager;
     }
 
-    @WrapWithCondition(method = "tick", at = @At(value = "FIELD",
-            target = "Lnet/minecraft/server/MinecraftServer;ticks:I", opcode = 181 /* PUTFIELD */))
-    public boolean wrapServerTickUpdate(MinecraftServer instance, int value) {
-        return !CONTEXT.frozen;
+    @Inject(
+            method = "tick",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/server/MinecraftServer;tickWorlds()V",
+                    shift = At.Shift.BEFORE,
+                    ordinal = 0
+            )
+    )
+    private void tickTRM(CallbackInfo ci) {
+        serverTickRateManager.tick();
     }
 
-    @WrapWithCondition(method = "tick", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/MinecraftServer;saveWorlds(Z)V"))
-    public boolean wrapAutosave(MinecraftServer instance, boolean silent) {
-        return !CONTEXT.frozen;
+
+    @WrapWithCondition(
+            method = "tick",
+            at = @At(
+                    value = "FIELD",
+                    target = "Lnet/minecraft/server/MinecraftServer;ticks:I",
+                    opcode = 181 /* PUTFIELD */
+            )
+    )
+    public boolean freezeTickCount(MinecraftServer instance, int value) {
+        return serverTickRateManager.runsNormally();
     }
 
-    @WrapWithCondition(method = "tickWorlds", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerWorld;tickEntities()V"))
-    public boolean wrapTickEntities(ServerWorld instance) {
-        return !CONTEXT.frozen;
+    @WrapWithCondition(
+            method = "tick",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/server/MinecraftServer;saveWorlds(Z)V"
+            )
+    )
+    public boolean freezeAutoSave(MinecraftServer instance, boolean silent) {
+        return serverTickRateManager.runsNormally();
     }
 }

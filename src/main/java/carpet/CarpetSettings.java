@@ -172,8 +172,9 @@ public class CarpetSettings {
     public static boolean creativeNoClip = false;
 
     @Rule(
-            desc = "Make client animations smooth for /tick rate and /tick freeze",
-            categories = CLIENT
+            desc = "smooth client animations with low tps settings",
+            extra = "works only in SP, and will slow down players",
+            categories = {CREATIVE, SURVIVAL, CLIENT}
     )
     public static boolean smoothClientAnimations = false;
 
@@ -408,7 +409,14 @@ public class CarpetSettings {
     @Rule(desc = "Mining blocks while sneaking and subscribed to /log carefulBreak will place them in your inventory ", categories = FEATURE)
     public static boolean carefulBreak = false;
 
-    // COMMAND // not sure how to generate those BIG comments
+    /*
+       ____                                          _
+      / ___|___  _ __ ___  _ __ ___   __ _ _ __   __| |
+     | |   / _ \| '_ ` _ \| '_ ` _ \ / _` | '_ \ / _` |
+     | |__| (_) | | | | | | | | | | | (_| | | | | (_| |
+      \____\___/|_| |_| |_|_| |_| |_|\__,_|_| |_|\__,_|
+     */
+    // COMMAND
     @Rule(
             desc = "Enables /chunk command",
             extra = {
@@ -419,6 +427,14 @@ public class CarpetSettings {
             options = {"true", "false", "ops", "0", "2", "4"}
     )
     public static String chunkCommand = "false";
+
+    @Rule(
+            desc = "Enables /tick command to control game clocks",
+            categories = {CREATIVE, COMMAND},
+            validators = CarpetPermissionLevel.class,
+            options = {"ops", "0", "2", "4"}
+    )
+    public static String commandTick = "ops";
 
 
     @Rule(desc = "Enables /log command to monitor events via chat and overlays", categories = COMMAND)
