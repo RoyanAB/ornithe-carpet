@@ -55,8 +55,7 @@ public class TickCommand extends CarpetAbstractCommand {
                     toggleSuperHot(commandSource);
                     break;
                 case "warp":
-                    // todo tick warp toggle
-                    setWarp(commandSource, 0, null);
+                    toggleWarp(commandSource);
                     break;
                 default:
                     break;
@@ -181,6 +180,16 @@ public class TickCommand extends CarpetAbstractCommand {
             Messenger.m(source, "gi Superhot enabled");
         } else {
             Messenger.m(source, "gi Superhot disabled");
+        }
+        return 1;
+    }
+
+    private static int toggleWarp(CommandSource source) {
+        ServerTickRateManager trm = ((MinecraftServerF) source.getServer()).getTickRateManager();
+        if (trm.isInWarpSpeed()) {
+            setWarp(source, 0, null);
+        } else {
+            setWarp(source, Integer.MAX_VALUE, null);
         }
         return 1;
     }
