@@ -1,9 +1,15 @@
 package carpet;
 
-import carpet.api.settings.*;
-import carpet.validators.*;
+import carpet.api.settings.CarpetRule;
+import carpet.api.settings.Rule;
+import carpet.api.settings.Validator;
+import carpet.api.settings.Validators;
 import carpet.utils.Messenger;
 import carpet.utils.Translations;
+import carpet.validators.ChunkMapCrashFixModifier;
+import carpet.validators.IFModifier;
+import carpet.validators.ITTModifier;
+import carpet.validators.RPModifier;
 import net.minecraft.server.command.source.CommandSource;
 import org.jetbrains.annotations.Nullable;
 
@@ -288,6 +294,16 @@ public class CarpetSettings {
     @Rule(desc = "Emerald ore receiving power throws an exception on update",
             categories = CREATIVE)
     public static boolean oreUpdateSuppressor = false;
+
+    @Rule(
+            desc = "Players can flip and rotate blocks when holding cactus",
+            extra = {
+                    "Doesn't cause block updates when rotated/flipped",
+                    "Applies to pistons, observers, droppers, repeaters, stairs, glazed terracotta etc...",
+            },
+            categories = CREATIVE
+    )
+    public static boolean flippinCactus = false;
 
     /*
          _____                         _
