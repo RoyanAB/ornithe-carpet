@@ -1,6 +1,8 @@
 package carpet.mixins.rule.flippinCactus;
 
 import carpet.helpers.BlockRotator;
+import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.entity.living.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -17,10 +19,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ServerPlayerInteractionManager.class)
 public class ServerPlayerInteractionManagerMixin {
-    @Inject(method = "useBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;getBlockState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/state/BlockState;", ordinal = 1, shift = At.Shift.AFTER), cancellable = true)
-    private void injectUseBlock(PlayerEntity player, World world, ItemStack stack, InteractionHand hand, BlockPos pos, Direction face, float dx, float dy, float dz, CallbackInfoReturnable<InteractionResult> cir) {
-        BlockState blockState = world.getBlockState(pos);
-        if (BlockRotator.flipBlockWithCactus(world, pos, blockState, player, hand, face, dx, dy, dz))
+    @Inject(
+            method = "useBlock",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/block/state/BlockState;getBlock()Lnet/minecraft/block/Block;",
+                    ordinal = 1
+            ),
+            cancellable = true
+    )
+    private void flipBlockWithCactus(PlayerEntity player, World world, ItemStack stack, InteractionHand hand, BlockPos pos, Direction face, float dx, float dy, float dz, CallbackInfoReturnable<InteractionResult> cir, @Local BlockState blockState) {
+
+        if (BlockRotator.flipBlockWithCactus(world, pos, blockState, player, hand, face, dx, dy, dz)) {
             cir.setReturnValue(InteractionResult.PASS);
+        }
     }
 }
